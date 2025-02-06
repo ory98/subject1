@@ -51,7 +51,7 @@
 
 - 사용자 계좌 리스트 조회 API
   - 경로 : /user/accounts
-  - POST 방식
+  - GET 방식
   - 파라미터 :
     - userName(사용자 이름)
 
