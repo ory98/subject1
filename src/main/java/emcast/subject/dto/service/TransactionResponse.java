@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 @Getter
 @AllArgsConstructor
@@ -20,7 +21,7 @@ public class TransactionResponse {
 
     private TransactionStatus status;
 
-    private BigDecimal balance; // 변경된 금액
+    private BigInteger balance; // 변경된 금액
 
-    private  BigDecimal currentTotalBalance; // 현재 잔여 잔액
+    private BigInteger currentTotalBalance; // 현재 잔여 잔액
 }

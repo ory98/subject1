@@ -41,24 +41,52 @@ public class AccountService {
             }
         }
 
-        // 해당 계좌 금액 올려주기
+        // 해당 계좌 금액 입금
         savedAccount.increaseBalance(dto.getBalance());
 
         // 계좌 내역 저장 accountHistory
-        accountHistoryService.saveAccountHistory(dto.getMemo(), dto.getBalance(), savedAccount, user);
+        accountHistoryService.saveAccountHistory(dto.getMemo(), dto.getBalance(), savedAccount, user, TransactionStatus.DEPOSIT);
 
         // 반환값
         TransactionResponse response = new TransactionResponse(user.getName(),
                 savedAccount.getBankName(), savedAccount.getAccountNumber(), TransactionStatus.DEPOSIT,
-                dto.getBalance() ,savedAccount.getBalance());
+                dto.getBalance().toBigInteger() ,savedAccount.getBalance().toBigInteger());
 
         return response;
     }
 
     @Transactional
     public TransactionResponse withdrawal(TransactionDto dto) {
+        // user
+        User user = userService.getUserInfo(dto.getUserName());
 
-        return new TransactionResponse();
+        // 해당계좌 있는지 확인
+        Account savedAccount = accountRepository.findByAccountNumber(dto.getAccountNumber())
+                .orElseThrow(() -> new CommonException(HttpStatus.BAD_REQUEST, "해당하는 계좌가 없습니다."));
+
+        // 적금 계좌인지 확인
+        if (savedAccount.getStatus().equals(AccountStatus.SAVINGS)) {
+            throw new CommonException(HttpStatus.BAD_REQUEST, "적금계좌는 출금이 불가합니다.");
+        }
+
+        // 해당 계좌의 금액과 출금하려는 금액 비교
+        int result = savedAccount.getBalance().compareTo(dto.getBalance());
+        if (result < 0) {
+            throw new CommonException(HttpStatus.BAD_REQUEST, String.format("잔액부족 / 현재잔액 : %s원", savedAccount.getBalance().toBigInteger().toString()));
+        }
+
+        // 해당 계좌 금액 출금
+        savedAccount.decreaseBalance(dto.getBalance());
+
+        // 계좌 내역 저장
+        accountHistoryService.saveAccountHistory(dto.getMemo(), dto.getBalance(), savedAccount, user, TransactionStatus.WITHDRAWAL);
+
+        // 반환값
+        TransactionResponse response = new TransactionResponse(user.getName(),
+                savedAccount.getBankName(), savedAccount.getAccountNumber(), TransactionStatus.DEPOSIT,
+                dto.getBalance().toBigInteger() ,savedAccount.getBalance().toBigInteger());
+
+        return response;
     }
 
     public AccountDetailResponse getAccountDetail(String userName, String accountNumber, String bankName) {

@@ -2,6 +2,7 @@ package emcast.subject.service;
 
 import emcast.subject.domain.Account;
 import emcast.subject.domain.AccountHistory;
+import emcast.subject.domain.TransactionStatus;
 import emcast.subject.domain.User;
 import emcast.subject.repository.AccountHistoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,9 @@ public class AccountHistoryService {
 
     private final AccountHistoryRepository accountHistoryRepository;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW) // 내역이 저장이되지 않더라도 진행 
-    public void saveAccountHistory(String memo, BigDecimal balance, Account account, User user) {
-        AccountHistory newHistory = AccountHistory.createHistory(memo, balance, account, user);
+    @Transactional(propagation = Propagation.REQUIRES_NEW) // 내역이 저장이되지 않더라도 진행
+    public void saveAccountHistory(String memo, BigDecimal balance, Account account, User user, TransactionStatus status) {
+        AccountHistory newHistory = AccountHistory.createHistory(memo, balance, account, user, status);
         accountHistoryRepository.save(newHistory);
     }
 }

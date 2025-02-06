@@ -1,10 +1,7 @@
 package emcast.subject.dto.controller;
 
 import emcast.subject.domain.TransactionStatus;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -28,6 +25,7 @@ public class TransactionRequest {
 
     @NotNull(message = "잔액은 필수 입력값입니다.")
     @Positive(message = "0보다 큰 값을 입력해주세요.")
+    @Digits(integer = 10, fraction = 0, message = "잔액은 소수점을 포함할 수 없습니다.")
     private BigDecimal balance;
 
 }

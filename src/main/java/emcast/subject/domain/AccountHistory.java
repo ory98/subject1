@@ -35,7 +35,7 @@ public class AccountHistory {
 
     private LocalDate transTime;
 
-    public static AccountHistory createHistory(String memo, BigDecimal amount, Account account, User user) {
+    public static AccountHistory createHistory(String memo, BigDecimal amount, Account account, User user, TransactionStatus status) {
         if ("".equals(memo)) memo = user.getName(); // 빈값일 경우 사용자 이름 삽입
 
         return AccountHistory.builder()
@@ -43,7 +43,7 @@ public class AccountHistory {
                 .amount(amount)
                 .account(account)
                 .user(user)
-                .status(TransactionStatus.DEPOSIT)
+                .status(status)
                 .transTime(LocalDate.now())
                 .build();
     }

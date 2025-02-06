@@ -25,22 +25,22 @@ PUT http://localhost:8080/withdrawal
 Content-Type: application/json
 
 // 일반 계좌
-//{
-//  "userName": "test",
-//  "memo" : "",
-//  "accountNumber": "111",
-//  "status": "DEPOSIT",
-//  "balance": 100
-//}
-
-// 적금 계좌
 {
   "userName": "test",
-  "memo" : "적금계좌",
-  "accountNumber": "333",
+  "memo" : "",
+  "accountNumber": "111",
   "status": "DEPOSIT",
-  "balance": 10000
+  "balance": 200000
 }
+
+// 적금 계좌
+//{
+//  "userName": "test",
+//  "memo" : "적금계좌",
+//  "accountNumber": "333",
+//  "status": "DEPOSIT",
+//  "balance": 10000
+//}
 
 ###
 GET http://localhost:8080/user/account
