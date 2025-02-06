@@ -12,7 +12,6 @@ import org.springframework.util.ObjectUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -20,7 +19,6 @@ import java.util.List;
 public class AccountService {
 
     private final UserService userService;
-    private final SavingsService savingsService;
     private final AccountHistoryService accountHistoryService;
 
     private final AccountRepository accountRepository;
