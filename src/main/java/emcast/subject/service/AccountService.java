@@ -45,17 +45,12 @@ public class AccountService {
         // 계좌 내역 저장 accountHistory
         accountHistoryService.saveAccountHistory(dto.getMemo(), dto.getBalance(), foundAccount, user, TransactionStatus.DEPOSIT);
 
-        // 반환값
-        TransactionResponse response = new TransactionResponse(user.getName(),
+        return new TransactionResponse(user.getName(),
                 foundAccount.getBankName(), foundAccount.getAccountNumber(), TransactionStatus.DEPOSIT,
                 dto.getBalance().toBigInteger() ,foundAccount.getBalance().toBigInteger());
-
-        return response;
     }
 
-
-    @Transactional(readOnly = true)
-    public void validateAccount(Account account, BigDecimal amount, TransactionStatus transactionStatus) {
+    private void validateAccount(Account account, BigDecimal amount, TransactionStatus transactionStatus) {
         // 날짜 확인
         if (transactionStatus.equals(TransactionStatus.DEPOSIT)) {
             account.getSavings().validDate();
@@ -83,45 +78,30 @@ public class AccountService {
         List<AccountHistoryInfo> accountHistoryInfos = accountHistoryService.getAccountHistoryInfos(user.getId());
 
         // 반환값
-        AccountDetailResponse response = new AccountDetailResponse(foundAccount.getAccountNumber(),
+         return new AccountDetailResponse(foundAccount.getAccountNumber(),
                 foundAccount.getBankName(), foundAccount.getBalance().toBigInteger(), accountHistoryInfos);
-
-
-        return response;
     }
 
     public AccountListResponse getUserAccounts(String userName) {
         // user
         User user = userService.getUserInfo(userName);
 
-        // 유저 계좌 가져오기
-        List<Account> foundAccounts = accountRepository.findAllByUserId(user.getId()).stream().toList();
-
         // 전체 금액 계산
-        BigInteger totalBalance = foundAccounts.stream()
-                .map(Account::getBalance)
-                .reduce(BigDecimal.ZERO, BigDecimal::add).toBigInteger(); // 모든 balance 합산
+        BigInteger totalBalance = user.calculateTotalBalance().toBigInteger();
 
         // 일반 계좌 금액 계산
-        BigInteger totalRegularBalance = foundAccounts.stream()
-                .filter(fa -> fa.getStatus().equals(AccountStatus.REGULAR))
-                .map(Account::getBalance)
-                .reduce(BigDecimal.ZERO, BigDecimal::add).toBigInteger();
+        BigInteger totalRegularBalance = user.calculateTotalRegularBalance().toBigInteger();
 
-        // 일반 계좌 금액 계산
-        BigInteger totalSavingsBalance = foundAccounts.stream()
-                .filter(fa -> fa.getStatus().equals(AccountStatus.SAVINGS))
-                .map(Account::getBalance)
-                .reduce(BigDecimal.ZERO, BigDecimal::add).toBigInteger();
+        // 적금 계좌 금액 계산
+        BigInteger totalSavingsBalance = user.calculateTotalSavingsBalance().toBigInteger();
 
         // 계좌 목록
-        List<AccountInfo> accountInfos = getAccountInfos(foundAccounts);
+        List<AccountInfo> accountInfos = getAccountInfos(user.getAccounts());
 
         // 반환값
-        AccountListResponse response = new AccountListResponse(user.getName(), totalBalance,
+        return new AccountListResponse(user.getName(), totalBalance,
                 totalRegularBalance, totalSavingsBalance, accountInfos);
 
-        return response;
     }
 
     public List<AccountInfo> getAccountInfos(List<Account> account) {
@@ -130,9 +110,8 @@ public class AccountService {
                         a.getBankName(),
                         a.getAccountNumber(),
                         a.getBalance().toBigInteger(),
-                        a.getSavings() != null && !ObjectUtils.isEmpty(a.getSavings())
-                        ? a.getSavings().getExpireDate() : null))
-                .toList();
+                        a.getExpireDate())
+                ).toList();
 
         return accountInfos;
     }

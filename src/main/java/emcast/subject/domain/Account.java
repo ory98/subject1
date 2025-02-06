@@ -5,8 +5,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.ObjectUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
@@ -60,6 +62,20 @@ public class Account {
         }
     }
 
+    public boolean isRegular() {
+        return AccountStatus.REGULAR.equals(this.status);
+    }
+
+    public boolean isSavings() {
+        return AccountStatus.SAVINGS.equals(this.status);
+    }
+
+    public LocalDate getExpireDate() {
+        if (savings == null || ObjectUtils.isEmpty(savings)) {
+            return null;
+        }
+        return savings.getExpireDate(); // 첫 번째 Savings의 만료 날짜 반환
+    }
 
     @Override
     public boolean equals(Object o) {
