@@ -17,7 +17,4 @@ public class AccountDetailRequest {
     @Pattern(regexp = "^[0-9]+$", message = "숫자만 입력 가능합니다.")
     private String accountNumber;
 
-    @NotBlank(message = "은행명을 입력해주세요.")
-    private String bankName;
-
 }

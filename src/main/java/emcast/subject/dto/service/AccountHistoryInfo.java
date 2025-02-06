@@ -5,17 +5,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.math.BigInteger;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
 public class AccountHistoryInfo {
 
-    private String subject;
+    private String memo;
 
-    private BigDecimal amount;
+    private BigInteger amount;
 
     private TransactionStatus status;
 
-    private LocalDateTime time;
+    private LocalDate date;
 }

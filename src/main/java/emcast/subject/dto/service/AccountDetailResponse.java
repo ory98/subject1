@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 @Getter
@@ -16,7 +16,7 @@ public class AccountDetailResponse {
 
     private String bankName;
 
-    private BigDecimal balance;
+    private BigInteger balance;
 
     private List<AccountHistoryInfo> accountHistoryInfos;
 

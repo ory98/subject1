@@ -38,8 +38,7 @@ public class AccountController {
     // 단일 조회(내정보,계좌번호,은행명 입력 > 잔액,history 조회)
     @GetMapping("/user/account")
     public ApiResponse<AccountDetailResponse> getAccountDetail(@Valid @RequestBody AccountDetailRequest request) {
-        AccountDetailResponse response = accountService.getAccountDetail(request.getUserName(),
-                request.getAccountNumber(), request.getBankName());
+        AccountDetailResponse response = accountService.getAccountDetail(request.getUserName(), request.getAccountNumber());
         return ApiResponse.success(response);
     }
 
