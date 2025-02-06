@@ -24,4 +24,9 @@ public class Savings {
 
     private LocalDate expireDate;
 
+    public Savings(Account account, BigDecimal interestRate) {
+        this.account = account;
+        this.interestRate = interestRate;
+        this.expireDate = LocalDate.now();
+    }
 }
