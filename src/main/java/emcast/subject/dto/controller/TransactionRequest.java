@@ -20,9 +20,6 @@ public class TransactionRequest {
     @Pattern(regexp = "^[0-9]+$", message = "숫자만 입력 가능합니다.")
     private String accountNumber;
 
-    @NotNull(message = "목적을 입력해주세요.")
-    private TransactionStatus status;
-
     @NotNull(message = "잔액은 필수 입력값입니다.")
     @Positive(message = "0보다 큰 값을 입력해주세요.")
     @Digits(integer = 10, fraction = 0, message = "잔액은 소수점을 포함할 수 없습니다.")

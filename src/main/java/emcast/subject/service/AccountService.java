@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -24,7 +23,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
 
     @Transactional
-    public TransactionResponse processTransaction(TransactionDto dto, TransactionStatus transactionStatus) {
+    public TransactionResponse processTransaction(TransactionDto dto) {
         // User 정보 가져오기
         User user = userService.getUserInfo(dto.getUserName());
 
@@ -33,12 +32,12 @@ public class AccountService {
                 .orElseThrow(() -> new CommonException(HttpStatus.BAD_REQUEST, "해당하는 계좌가 없습니다."));
 
         // 계좌 상태 및 적금 검증
-        validateAccount(foundAccount, dto.getBalance(), transactionStatus);
+        validateAccount(foundAccount, dto.getBalance(), dto.getStatus());
 
         // 해당 계좌 거래
-        if (transactionStatus == TransactionStatus.DEPOSIT) {
+        if (dto.getStatus() == TransactionStatus.DEPOSIT) {
             foundAccount.increaseBalance(dto.getBalance());
-        } else if (transactionStatus == TransactionStatus.WITHDRAWAL) {
+        } else if (dto.getStatus() == TransactionStatus.WITHDRAWAL) {
             foundAccount.decreaseBalance(dto.getBalance());
         }
 

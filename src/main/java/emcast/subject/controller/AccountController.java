@@ -20,9 +20,9 @@ public class AccountController {
     @PutMapping("/deposit")
     public ApiResponse<TransactionResponse> deposit(@Valid @RequestBody TransactionRequest request) {
         TransactionDto transactionDto = new TransactionDto(request.getUserName(), request.getAccountNumber(),
-                request.getStatus(), request.getBalance(), request.getMemo());
+                TransactionStatus.DEPOSIT, request.getBalance(), request.getMemo());
 
-        TransactionResponse response = accountService.processTransaction(transactionDto, TransactionStatus.DEPOSIT);
+        TransactionResponse response = accountService.processTransaction(transactionDto);
         return ApiResponse.success(response);
     }
 
@@ -30,9 +30,9 @@ public class AccountController {
     @PutMapping("/withdrawal")
     public ApiResponse<TransactionResponse> withdrawal(@Valid @RequestBody TransactionRequest request) {
         TransactionDto transactionDto = new TransactionDto(request.getUserName(), request.getAccountNumber(),
-                request.getStatus(), request.getBalance(), request.getMemo());
+                TransactionStatus.WITHDRAWAL, request.getBalance(), request.getMemo());
 
-        TransactionResponse response = accountService.processTransaction(transactionDto, TransactionStatus.WITHDRAWAL);
+        TransactionResponse response = accountService.processTransaction(transactionDto);
         return ApiResponse.success(response);
     }
 
