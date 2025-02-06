@@ -7,7 +7,6 @@ Content-Type: application/json
 //  "userName": "test",
 //  "memo" : "",
 //  "accountNumber": "111",
-//  "status": "DEPOSIT",
 //  "balance": 100
 //}
 
@@ -16,7 +15,6 @@ Content-Type: application/json
   "userName": "test",
   "memo" : "적금계좌",
   "accountNumber": "333",
-  "status": "DEPOSIT",
   "balance": 10000
 }
 
@@ -29,7 +27,6 @@ Content-Type: application/json
 //  "userName": "test",
 //  "memo" : "",
 //  "accountNumber": "111",
-//  "status": "WITHDRAWAL",
 //  "balance": 200000
 //}
 
@@ -38,7 +35,6 @@ Content-Type: application/json
   "userName": "test",
   "memo" : "적금계좌",
   "accountNumber": "333",
-  "status": "WITHDRAWAL",
   "balance": 10000
 }
 

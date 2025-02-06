@@ -71,10 +71,7 @@ public class Account {
     }
 
     public LocalDate getExpireDate() {
-        if (savings == null || ObjectUtils.isEmpty(savings)) {
-            return null;
-        }
-        return savings.getExpireDate(); // 첫 번째 Savings의 만료 날짜 반환
+        return (savings == null) ? null : savings.getExpireDate();
     }
 
     @Override
