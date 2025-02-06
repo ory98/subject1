@@ -8,7 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -23,7 +26,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
 
     @Transactional
-    public TransactionResponse deposit(TransactionDto dto) {
+    public TransactionResponse processTransaction(TransactionDto dto, TransactionStatus transactionStatus) {
         // User 정보 가져오기
         User user = userService.getUserInfo(dto.getUserName());
 
@@ -31,16 +34,15 @@ public class AccountService {
         Account foundAccount = accountRepository.findByAccountNumber(dto.getAccountNumber())
                 .orElseThrow(() -> new CommonException(HttpStatus.BAD_REQUEST, "해당하는 계좌가 없습니다."));
 
-        // 적금 계좌일 경우 만기 날짜 확인
-        if (foundAccount.getStatus().equals(AccountStatus.SAVINGS)) {
-            Savings savingsInfo = savingsService.getSavingsInfo(foundAccount.getId());
-            if (savingsInfo.getExpireDate().isBefore(LocalDate.now())) {
-                throw new CommonException(HttpStatus.BAD_REQUEST, "만기날짜가 지났습니다. 입금할 수 없습니다.");
-            }
-        }
+        // 계좌 상태 및 적금 검증
+        validateAccount(foundAccount, dto.getBalance(), transactionStatus);
 
-        // 해당 계좌 금액 입금
-        foundAccount.increaseBalance(dto.getBalance());
+        // 해당 계좌 거래
+        if (transactionStatus == TransactionStatus.DEPOSIT) {
+            foundAccount.increaseBalance(dto.getBalance());
+        } else if (transactionStatus == TransactionStatus.WITHDRAWAL) {
+            foundAccount.decreaseBalance(dto.getBalance());
+        }
 
         // 계좌 내역 저장 accountHistory
         accountHistoryService.saveAccountHistory(dto.getMemo(), dto.getBalance(), foundAccount, user, TransactionStatus.DEPOSIT);
@@ -53,38 +55,24 @@ public class AccountService {
         return response;
     }
 
-    @Transactional
-    public TransactionResponse withdrawal(TransactionDto dto) {
-        // user
-        User user = userService.getUserInfo(dto.getUserName());
 
-        // 해당계좌 있는지 확인
-        Account foundAccount = accountRepository.findByAccountNumber(dto.getAccountNumber())
-                .orElseThrow(() -> new CommonException(HttpStatus.BAD_REQUEST, "해당하는 계좌가 없습니다."));
-
-        // 적금 계좌인지 확인
-        if (foundAccount.getStatus().equals(AccountStatus.SAVINGS)) {
-            throw new CommonException(HttpStatus.BAD_REQUEST, "적금계좌는 출금이 불가합니다.");
+    @Transactional(readOnly = true)
+    public void validateAccount(Account account, BigDecimal amount, TransactionStatus transactionStatus) {
+        // 적금 계좌일 경우 추가 검증
+        if (account.getStatus().equals(AccountStatus.SAVINGS)) {
+            if (transactionStatus == TransactionStatus.WITHDRAWAL) {
+                throw new CommonException(HttpStatus.BAD_REQUEST, "적금 계좌는 출금이 불가합니다.");
+            }
+            
+            // 날짜 확인
+            account.getSavings().validDate();
+        }
+        // 출금 시 잔액 확인
+        if (transactionStatus == TransactionStatus.WITHDRAWAL && account.getBalance().compareTo(amount) < 0) {
+            throw new CommonException(HttpStatus.BAD_REQUEST,
+                    String.format("잔액부족 / 현재잔액 : %s원", account.getBalance().toBigInteger().toString()));
         }
 
-        // 해당 계좌의 금액과 출금하려는 금액 비교
-        int result = foundAccount.getBalance().compareTo(dto.getBalance());
-        if (result < 0) {
-            throw new CommonException(HttpStatus.BAD_REQUEST, String.format("잔액부족 / 현재잔액 : %s원", foundAccount.getBalance().toBigInteger().toString()));
-        }
-
-        // 해당 계좌 금액 출금
-        foundAccount.decreaseBalance(dto.getBalance());
-
-        // 계좌 내역 저장
-        accountHistoryService.saveAccountHistory(dto.getMemo(), dto.getBalance(), foundAccount, user, TransactionStatus.WITHDRAWAL);
-
-        // 반환값
-        TransactionResponse response = new TransactionResponse(user.getName(),
-                foundAccount.getBankName(), foundAccount.getAccountNumber(), TransactionStatus.DEPOSIT,
-                dto.getBalance().toBigInteger() ,foundAccount.getBalance().toBigInteger());
-
-        return response;
     }
 
     public AccountDetailResponse getAccountDetail(String userName, String accountNumber) {
@@ -107,8 +95,50 @@ public class AccountService {
     }
 
     public AccountListResponse getUserAccounts(String userName) {
+        // user
+        User user = userService.getUserInfo(userName);
 
-        return new AccountListResponse();
+        // 유저 계좌 가져오기
+        List<Account> foundAccounts = accountRepository.findAllByUserId(user.getId()).stream().toList();
+
+        // 전체 금액 계산
+        BigInteger totalBalance = foundAccounts.stream()
+                .map(Account::getBalance)
+                .reduce(BigDecimal.ZERO, BigDecimal::add).toBigInteger(); // 모든 balance 합산
+
+        // 일반 계좌 금액 계산
+        BigInteger totalRegularBalance = foundAccounts.stream()
+                .filter(fa -> fa.getStatus().equals(AccountStatus.REGULAR))
+                .map(Account::getBalance)
+                .reduce(BigDecimal.ZERO, BigDecimal::add).toBigInteger();
+
+        // 일반 계좌 금액 계산
+        BigInteger totalSavingsBalance = foundAccounts.stream()
+                .filter(fa -> fa.getStatus().equals(AccountStatus.SAVINGS))
+                .map(Account::getBalance)
+                .reduce(BigDecimal.ZERO, BigDecimal::add).toBigInteger();
+
+        // 계좌 목록
+        List<AccountInfo> accountInfos = getAccountInfos(foundAccounts);
+
+        // 반환값
+        AccountListResponse response = new AccountListResponse(user.getName(), totalBalance,
+                totalRegularBalance, totalSavingsBalance, accountInfos);
+
+        return response;
+    }
+
+    public List<AccountInfo> getAccountInfos(List<Account> account) {
+        List<AccountInfo> accountInfos = account.stream()
+                .map(a -> new AccountInfo(
+                        a.getBankName(),
+                        a.getAccountNumber(),
+                        a.getBalance().toBigInteger(),
+                        a.getSavings() != null && !ObjectUtils.isEmpty(a.getSavings())
+                        ? a.getSavings().getExpireDate() : null))
+                .toList();
+
+        return accountInfos;
     }
 
 }

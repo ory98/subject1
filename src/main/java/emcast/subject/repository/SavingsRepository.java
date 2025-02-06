@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface SavingsRepository extends JpaRepository<Savings, Long> {
 
-    @Query(value = "select s from Savings s where s.accountId = :accountId")
+    @Query(value = "select s from Savings s where s.account.id = :accountId")
     Optional<Savings> findByAccountId(@Param("accountId") Long accountId);
 }

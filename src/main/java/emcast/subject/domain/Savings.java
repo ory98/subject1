@@ -1,8 +1,10 @@
 package emcast.subject.domain;
 
+import emcast.subject.exception.CommonException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,15 +19,23 @@ public class Savings {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long accountId;
+    @OneToOne(fetch = FetchType.LAZY)
+    private Account account;
 
     private BigDecimal interestRate; // 이자율
 
     private LocalDate expireDate;
 
-    public Savings(Long accountId, BigDecimal interestRate, LocalDate expireDate) {
-        this.accountId = accountId;
+    public Savings(Account account, BigDecimal interestRate, LocalDate expireDate) {
+        this.account = account;
         this.interestRate = interestRate;
         this.expireDate = expireDate;
     }
+
+    public void validDate() {
+        if (expireDate.isBefore(LocalDate.now())) {
+            throw new CommonException(HttpStatus.BAD_REQUEST, "만기날짜가 지났습니다. 입금할 수 없습니다.");
+        }
+    }
+
 }

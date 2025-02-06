@@ -5,10 +5,8 @@ import emcast.subject.domain.AccountHistory;
 import emcast.subject.domain.TransactionStatus;
 import emcast.subject.domain.User;
 import emcast.subject.dto.service.AccountHistoryInfo;
-import emcast.subject.exception.CommonException;
 import emcast.subject.repository.AccountHistoryRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +27,8 @@ public class AccountHistoryService {
     }
 
     public List<AccountHistoryInfo> getAccountHistoryInfos(Long userId) {
-        List<AccountHistoryInfo> accountHistoryInfos = accountHistoryRepository.findAllByUserId(userId)
-                .stream().map(ah -> new AccountHistoryInfo(ah.getMemo(), ah.getAmount().toBigInteger(), ah.getStatus(), ah.getTransTime()))
+        List<AccountHistoryInfo> accountHistoryInfos = accountHistoryRepository.findAllByUserId(userId).stream()
+                .map(ah -> new AccountHistoryInfo(ah.getMemo(), ah.getAmount().toBigInteger(), ah.getStatus(), ah.getTransTime()))
                 .toList();
 
         return accountHistoryInfos;

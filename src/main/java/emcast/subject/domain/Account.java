@@ -28,6 +28,9 @@ public class Account {
 
     private BigDecimal balance;
 
+    @OneToOne(mappedBy = "account")
+    private Savings savings;
+
     public Account(User user, AccountStatus status, String accountNumber, String bankName, BigDecimal balance) {
         this.user = user;
         this.status = status;

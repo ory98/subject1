@@ -1,5 +1,6 @@
 package emcast.subject.controller;
 
+import emcast.subject.domain.TransactionStatus;
 import emcast.subject.dto.ApiResponse;
 import emcast.subject.dto.controller.AccountDetailRequest;
 import emcast.subject.dto.controller.TransactionRequest;
@@ -21,7 +22,7 @@ public class AccountController {
         TransactionDto transactionDto = new TransactionDto(request.getUserName(), request.getAccountNumber(),
                 request.getStatus(), request.getBalance(), request.getMemo());
 
-        TransactionResponse response = accountService.deposit(transactionDto);
+        TransactionResponse response = accountService.processTransaction(transactionDto, TransactionStatus.DEPOSIT);
         return ApiResponse.success(response);
     }
 
@@ -31,7 +32,7 @@ public class AccountController {
         TransactionDto transactionDto = new TransactionDto(request.getUserName(), request.getAccountNumber(),
                 request.getStatus(), request.getBalance(), request.getMemo());
 
-        TransactionResponse response = accountService.withdrawal(transactionDto);
+        TransactionResponse response = accountService.processTransaction(transactionDto, TransactionStatus.WITHDRAWAL);
         return ApiResponse.success(response);
     }
 
