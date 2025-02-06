@@ -1,8 +1,10 @@
 package emcast.subject.domain;
 
+import emcast.subject.exception.CommonException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -45,6 +47,17 @@ public class Account {
 
     public void decreaseBalance(BigDecimal amount) {
         this.balance = this.balance.subtract(amount);
+    }
+
+    public void validSavingsAccount() {
+        if (status.equals(AccountStatus.SAVINGS)) {
+            throw new CommonException(HttpStatus.BAD_REQUEST, "적금계좌는 출금이 불가합니다.");
+        }
+    }
+    public void validBalance(BigDecimal amount) {
+        if (balance.subtract(amount).compareTo(BigDecimal.ZERO) < 0) {
+            throw new CommonException(HttpStatus.BAD_REQUEST, String.format("잔액부족 / 현재잔액 : %s원", balance.toBigInteger()));
+        }
     }
 
 

@@ -34,7 +34,7 @@ public class Savings {
 
     public void validDate() {
         if (expireDate.isBefore(LocalDate.now())) {
-            throw new CommonException(HttpStatus.BAD_REQUEST, "만기날짜가 지났습니다. 입금할 수 없습니다.");
+            throw new CommonException(HttpStatus.BAD_REQUEST, "만기날짜가 지났습니다.");
         }
     }
 

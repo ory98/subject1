@@ -1,4 +1,4 @@
-###
+### 입금
 PUT http://localhost:8080/deposit
 Content-Type: application/json
 
@@ -20,29 +20,29 @@ Content-Type: application/json
   "balance": 10000
 }
 
-###
+### 출금
 PUT http://localhost:8080/withdrawal
 Content-Type: application/json
 
 // 일반 계좌
-{
-  "userName": "test",
-  "memo" : "",
-  "accountNumber": "111",
-  "status": "WITHDRAWAL",
-  "balance": 200000
-}
-
-// 적금 계좌
 //{
 //  "userName": "test",
-//  "memo" : "적금계좌",
-//  "accountNumber": "333",
+//  "memo" : "",
+//  "accountNumber": "111",
 //  "status": "WITHDRAWAL",
-//  "balance": 10000
+//  "balance": 200000
 //}
 
-###
+// 적금 계좌
+{
+  "userName": "test",
+  "memo" : "적금계좌",
+  "accountNumber": "333",
+  "status": "WITHDRAWAL",
+  "balance": 10000
+}
+
+###  계좌상세 조회
 GET http://localhost:8080/user/account
 Content-Type: application/json
 
@@ -60,7 +60,7 @@ Content-Type: application/json
   "bankName": "하나은행"
 }
 
-###
+### 사용자 계좌 목록 조회
 GET http://localhost:8080/user/accounts?userName=test
 
 

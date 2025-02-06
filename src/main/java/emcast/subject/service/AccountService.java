@@ -56,20 +56,18 @@ public class AccountService {
 
     @Transactional(readOnly = true)
     public void validateAccount(Account account, BigDecimal amount, TransactionStatus transactionStatus) {
-        // 적금 계좌일 경우 추가 검증
-        if (account.getStatus().equals(AccountStatus.SAVINGS)) {
-            if (transactionStatus == TransactionStatus.WITHDRAWAL) {
-                throw new CommonException(HttpStatus.BAD_REQUEST, "적금 계좌는 출금이 불가합니다.");
-            }
-            
-            // 날짜 확인
+        // 날짜 확인
+        if (transactionStatus.equals(TransactionStatus.DEPOSIT)) {
             account.getSavings().validDate();
         }
-        // 출금 시 잔액 확인
-        if (transactionStatus == TransactionStatus.WITHDRAWAL && account.getBalance().compareTo(amount) < 0) {
-            throw new CommonException(HttpStatus.BAD_REQUEST,
-                    String.format("잔액부족 / 현재잔액 : %s원", account.getBalance().toBigInteger().toString()));
+
+        // 적금일 경우, 출금 불가
+        if (transactionStatus.equals(TransactionStatus.WITHDRAWAL)) {
+            account.validSavingsAccount();
         }
+
+        // 출금 시 잔액 확인
+        account.validBalance(amount);
 
     }
 
