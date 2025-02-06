@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -40,9 +41,8 @@ public class InitDb {
         accountRepository.saveAll(accounts);
 
         // savings
-        Savings savings = new Savings(accounts.get(2), new BigDecimal(4.2));
+        Savings savings = new Savings(accounts.get(2).getId(), new BigDecimal(4.2), LocalDate.of(2025, 12, 31));
         savingsRepository.save(savings);
-
 
     }
 }

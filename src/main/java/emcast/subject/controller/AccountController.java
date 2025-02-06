@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AccountController {
 
-    private AccountService accountService;
+    private final AccountService accountService;
 
     // 입금(일반, 적금)
     @PutMapping("/deposit")
     public ApiResponse<TransactionResponse> deposit(@Valid @RequestBody TransactionRequest request) {
         TransactionDto transactionDto = new TransactionDto(request.getUserName(), request.getAccountNumber(),
-                request.getStatus(), request.getBalance());
+                request.getStatus(), request.getBalance(), request.getMemo());
 
         TransactionResponse response = accountService.deposit(transactionDto);
         return ApiResponse.success(response);
@@ -29,7 +29,7 @@ public class AccountController {
     @PutMapping("/withdrawal")
     public ApiResponse<TransactionResponse> withdrawal(@Valid @RequestBody TransactionRequest request) {
         TransactionDto transactionDto = new TransactionDto(request.getUserName(), request.getAccountNumber(),
-                request.getStatus(), request.getBalance());
+                request.getStatus(), request.getBalance(), request.getMemo());
 
         TransactionResponse response = accountService.withdrawal(transactionDto);
         return ApiResponse.success(response);
@@ -37,7 +37,7 @@ public class AccountController {
 
     // 단일 조회(내정보,계좌번호,은행명 입력 > 잔액,history 조회)
     @GetMapping("/user/account")
-    public ApiResponse<AccountDetailResponse> getAccountDetail(@Valid @RequestParam AccountDetailRequest request) {
+    public ApiResponse<AccountDetailResponse> getAccountDetail(@Valid @RequestBody AccountDetailRequest request) {
         AccountDetailResponse response = accountService.getAccountDetail(request.getUserName(),
                 request.getAccountNumber(), request.getBankName());
         return ApiResponse.success(response);

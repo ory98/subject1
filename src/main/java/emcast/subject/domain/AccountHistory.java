@@ -1,15 +1,19 @@
 package emcast.subject.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "account_history")
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class AccountHistory {
 
@@ -17,15 +21,31 @@ public class AccountHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String subject;
+    private String memo;
 
     private BigDecimal amount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Account account;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     private TransactionStatus status;
 
-    private LocalDateTime transTime;
+    private LocalDate transTime;
+
+    public static AccountHistory createHistory(String memo, BigDecimal amount, Account account, User user) {
+        if ("".equals(memo)) memo = user.getName(); // 빈값일 경우 사용자 이름 삽입
+
+        return AccountHistory.builder()
+                .memo(memo)
+                .amount(amount)
+                .account(account)
+                .user(user)
+                .status(TransactionStatus.DEPOSIT)
+                .transTime(LocalDate.now())
+                .build();
+    }
 
 }

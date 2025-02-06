@@ -20,4 +20,6 @@ public class TransactionDto {
     private TransactionStatus status;
 
     private BigDecimal balance;
+
+    private String memo;
 }

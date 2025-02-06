@@ -4,6 +4,7 @@ import emcast.subject.domain.TransactionStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -16,6 +17,8 @@ public class TransactionRequest {
     @NotBlank(message = "사용자 이름을 입력해주세요.")
     private String userName;
 
+    private String memo;
+
     @NotBlank(message = "계좌 번호를 입력해주세요.")
     @Pattern(regexp = "^[0-9]+$", message = "숫자만 입력 가능합니다.")
     private String accountNumber;
@@ -24,7 +27,7 @@ public class TransactionRequest {
     private TransactionStatus status;
 
     @NotNull(message = "잔액은 필수 입력값입니다.")
-    @Pattern(regexp = "^[1-9][0-9]*$", message = "0 이상의 숫자만 입력해주세요.")
+    @Positive(message = "0보다 큰 값을 입력해주세요.")
     private BigDecimal balance;
 
 }

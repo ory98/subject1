@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Entity
 @Table(name = "account")
@@ -33,5 +34,23 @@ public class Account {
         this.accountNumber = accountNumber;
         this.bankName = bankName;
         this.balance = balance;
+    }
+
+    public void increaseBalance(BigDecimal amount) {
+        this.balance = this.balance.add(amount);
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Account that = (Account) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }
