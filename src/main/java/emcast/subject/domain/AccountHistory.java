@@ -19,6 +19,7 @@ public class AccountHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "account_history_id")
     private Long id;
 
     private String memo;
@@ -26,9 +27,11 @@ public class AccountHistory {
     private BigDecimal amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
     private Account account;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 
     private TransactionStatus status;

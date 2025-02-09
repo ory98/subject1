@@ -17,17 +17,14 @@ public class Savings {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "savings_id")
     private Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    private Account account;
 
     private BigDecimal interestRate; // 이자율
 
     private LocalDate expireDate;
 
-    public Savings(Account account, BigDecimal interestRate, LocalDate expireDate) {
-        this.account = account;
+    public Savings(BigDecimal interestRate, LocalDate expireDate) {
         this.interestRate = interestRate;
         this.expireDate = expireDate;
     }

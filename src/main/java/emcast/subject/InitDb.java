@@ -31,18 +31,22 @@ public class InitDb {
         User user = new User("test");
         userRepository.save(user);
 
+        // savings
+        Savings savings = new Savings(new BigDecimal(4.2), LocalDate.of(2025, 12, 31));
+        savingsRepository.save(savings);
+
         // account
         List<Account> accounts = List.of(
-                new Account(user, AccountStatus.REGULAR, "111", "우리은행", new BigDecimal(1_000_000)),
-                new Account(user, AccountStatus.REGULAR, "222", "신한은행", new BigDecimal(2_000_000)),
-                new Account(user, AccountStatus.SAVINGS, "333", "하나은행", new BigDecimal(3_000_000)),
-                new Account(user, AccountStatus.REGULAR, "444", "하나은행", new BigDecimal(4_000_000))
+                new Account(user, AccountStatus.REGULAR, "111", "우리은행", new BigDecimal(1_000_000), null),
+                new Account(user, AccountStatus.REGULAR, "222", "신한은행", new BigDecimal(2_000_000), null),
+                new Account(user, AccountStatus.SAVINGS, "333", "하나은행", new BigDecimal(3_000_000), savings),
+                new Account(user, AccountStatus.REGULAR, "444", "하나은행", new BigDecimal(4_000_000), null)
         );
         accountRepository.saveAll(accounts);
 
-        // savings
-        Savings savings = new Savings(accounts.get(2), new BigDecimal(4.2), LocalDate.of(2025, 12, 31));
-        savingsRepository.save(savings);
 
+
+        accountRepository.flush();
+        savingsRepository.flush();
     }
 }

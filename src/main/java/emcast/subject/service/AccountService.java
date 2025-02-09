@@ -19,8 +19,8 @@ public class AccountService {
 
     private final UserService userService;
     private final AccountHistoryService accountHistoryService;
-
     private final AccountRepository accountRepository;
+
 
     @Transactional
     public TransactionResponse processTransaction(TransactionDto dto) {
@@ -32,7 +32,7 @@ public class AccountService {
                 .orElseThrow(() -> new CommonException(HttpStatus.BAD_REQUEST, "해당하는 계좌가 없습니다."));
 
         // 계좌 상태 및 적금 검증
-        validateAccount(foundAccount, dto.getBalance(), dto.getStatus());
+        validDateAccount(foundAccount, dto.getBalance(), dto.getStatus());
 
         // 해당 계좌 거래
         if (dto.getStatus() == TransactionStatus.DEPOSIT) {
@@ -49,20 +49,9 @@ public class AccountService {
                 dto.getBalance().toBigInteger() ,foundAccount.getBalance().toBigInteger());
     }
 
-    private void validateAccount(Account account, BigDecimal amount, TransactionStatus transactionStatus) {
-        // 날짜 확인
-        if (transactionStatus.equals(TransactionStatus.DEPOSIT)) {
-            account.getSavings().validDate();
-        }
-
-        // 적금일 경우, 출금 불가
-        if (transactionStatus.equals(TransactionStatus.WITHDRAWAL)) {
-            account.validSavingsAccount();
-        }
-
-        // 출금 시 잔액 확인
-        account.validBalance(amount);
-
+    private void validDateAccount(Account account, BigDecimal amount, TransactionStatus transactionStatus) {
+        account.validSavings(transactionStatus);
+        account.validRegular(amount);
     }
 
     public AccountDetailResponse getAccountDetail(String userName, String accountNumber) {
